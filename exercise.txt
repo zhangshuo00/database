@@ -1,0 +1,18 @@
+--01
+select sname,sno,nativee
+from student;
+--02
+select cname,credit
+from course;
+--03
+select tname,sex,tel
+from teacher;
+--04
+select cno,cname,lecture
+from course;
+--05
+select '联系方式 '+ sname,tel
+from student;
+--06
+select COUNT(tname)
+from teacher;
