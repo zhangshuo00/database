@@ -1,0 +1,39 @@
+select COUNT(*)
+from student;
+
+select sno,SUM(grade),MAX(grade),MIN(grade),AVG(grade)
+from SC
+group by sno
+having SUM(grade)>=170;
+
+--where子句里不能出现聚集函数
+select AVG(grade)
+from SC
+where cno='1';
+
+select cno,COUNT(sno)
+from SC
+group by cno;
+
+select sno
+from SC
+group by sno
+having COUNT(cno)>=3;
+
+--多表连接
+select *
+from student,SC,Course
+where student.sno = SC.sno and
+SC.cno = Course.cno;
+
+--对于重复字段，前边加对应表名
+select student.sno,sage,sname,cno,grade
+from student,SC
+where student.sno = SC.sno;
+
+--自身连接
+select first.cno,second.cpno
+from Course first,Course second--起别名
+where first.cpno = second.cno;
+
+

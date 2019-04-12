@@ -1,0 +1,28 @@
+--create database studentclass;
+--use studentclass;
+--use master;
+--drop database studentclass;
+create table Student(
+	sno char(9) primary key,
+	sname varchar(20) unique,
+	ssex char(4) not null,
+	sage smallint,
+	sdept varchar(10)
+);
+create table Course(
+	cno char(5) primary key,
+	cname varchar(10) unique,
+	cpno char(5),
+	ccredit smallint,
+	foreign key (cpno) references Course(cno)
+);
+
+create table SC(
+	sno char(9),
+	cno char(5),
+	grade int,
+	primary key(sno,cno),
+	foreign key (sno) references Student(sno),
+	foreign key (cno) references Course(cno)
+);
+

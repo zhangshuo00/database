@@ -1,0 +1,70 @@
+--投影查询
+select sno,sname,sdept
+from Student;
+
+select sno,sname,2019-sage birthday --并新建列名birthday
+from Student;
+
+select sno,sname,'2019' entrance
+from Student;
+
+select *--查询全部记录
+from Student;
+
+select COUNT(*)--是以元组计数，即便元组内有部分值为null也不影响结果
+from student;
+--COUNT()不计null值，但重复值计入
+
+select distinct sno
+from SC;
+
+select distinct cno,grade
+from SC;
+
+select sname,sage
+from student
+where sage<20;
+
+select sname,sage
+from student
+where not sage>=20;
+
+select sno,sname
+from student
+where ssex='女';
+
+select cname
+from Course
+where ccredit=4;
+
+select distinct sno
+from SC
+where grade>85;
+
+select sname,sdept,sage
+from student
+where sage not between 20 and 23;--注意not的位置
+
+select sname,sdept
+from student
+where sdept='IS' or sdept='CS' or sdept='MA';
+
+select sname,sdept
+from student
+where sdept in('IS','CS','MA');--这个和上边的等价
+
+select *
+from student
+where sname like '刘%';--模糊查询
+
+select *
+from student
+where sname like '刘_';
+
+select *
+from student
+where sname like '%刘%';
+
+select *
+from Course
+where cname like '数据\_%' escape '\';

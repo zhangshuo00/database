@@ -1,0 +1,15 @@
+use studentclass;
+use master;
+alter table Student add entrance date;--添加列
+alter table Student drop column entrance;--删除列
+alter table Student add entrance date;
+alter table Student add unique(entrance);--在某列添加unique约束
+
+alter table Student add constraint S_uni unique(entrance);--在某列添加约束
+alter table Student drop constraint S_uni;--删除约束
+--添加not null约束??
+
+--primarykey 只能添加在非空的属性列上，不能添加在空的属性列上
+alter table Student alter column entrance varchar(10);--更改数据类型
+
+

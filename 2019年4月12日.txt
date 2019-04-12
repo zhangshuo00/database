@@ -1,0 +1,58 @@
+create table aaa(
+	sdept char(9) primary key,	
+	average int
+);
+select sdept,AVG(sage)
+from student
+group by sdept
+having AVG(sage)IS NOT null;
+
+insert into aaa
+	select sdept,AVG(sage)
+	from student
+	group by sdept
+	having AVG(sage)IS NOT null;
+	
+select *
+from SC;
+
+--数据更新
+update student
+set sage = 3
+where sno = '201215121';
+
+update student
+set sdept = null
+where sno = '201215121';
+
+update SC
+set grade = 0
+where sno in (
+	select sno
+	from student
+	where sdept = 'cs'
+);
+
+create view is_student
+as
+select sno,sname,sage
+from student
+where sdept = 'IS'
+with check option;
+
+select *
+from bbb;
+
+create view bbb
+as
+select student.sno,sname,grade
+from student,sc
+where student.sno = SC.sno
+and cno = '1'
+and sdept = 'CS';
+
+create view ccc
+as
+	select sno,AVG(grade)
+	from SC
+	group by sno;

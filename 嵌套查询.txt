@@ -1,0 +1,41 @@
+--嵌套查询
+select *
+from student
+where sdept in (select sdept
+				from student
+				where sname = '刘晨');
+				
+select sno,sname
+from student
+where sno in (
+				select sno
+				from SC
+				where cno in (
+					select cno
+					from Course
+					where cname = '信息系统'
+				)
+			);
+select sno,cno
+from SC x
+where grade>(select AVG(grade)
+from SC y
+where y.sno = x.sno);
+-->any 大于子查询结果中的最小值
+-->all 大于子查询结果中的最大值
+select sage
+from student
+where sdept = 'cs';
+
+select sname,sage
+from student
+where sdept <>'cs' and sage<all(select sage
+from student
+where sdept = 'cs');
+
+select sname
+from student
+where exists (select *
+from SC
+where sno = student.sno and sno = '1');
+
