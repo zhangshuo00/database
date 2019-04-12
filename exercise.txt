@@ -16,3 +16,16 @@ from student;
 --06
 select COUNT(tname)
 from teacher;
+--07 使用列别名
+select tname,home,zipcode '邮政编码'
+from teacher;
+--08
+select sname
+from student;
+--09
+select distinct tno--去除重复结果
+from teacher_course
+where semester = '2';
+--10
+select distinct sno
+from student_course;
