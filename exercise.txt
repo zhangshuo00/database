@@ -13,7 +13,7 @@ from course;
 --05
 select '联系方式 '+ sname,tel
 from student;
---06
+--6)查询全体教师的人数
 select COUNT(tname)
 from teacher;
 --07 使用列别名
@@ -92,20 +92,132 @@ select MAX(score) '最大值',MIN(score)'最小值'
 from student_course
 where  cno = '2';
 --26)查询所有教师的人数
+select COUNT(tname) '总数'
+from teacher;
 --27)查询所有专业号为 1 的学生人数
+select COUNT(sno)
+from student
+where pno = '1';
 --28)查询选课人数超过 5 人的课程编号
+select cno
+from student_course
+group by cno
+having COUNT(*) > 5;
 --29)查询所有学生的基本信息以及所在学院的名称和学院联系电话
+select student.*,department.dname,department.dtel
+from student,department
+where student.dno = department.dno;
 --30)查询教师李亮的上课时间、上课地点和每周学时数
+select classtime,classroom,weektime
+from teacher_course
+where tno in (
+	select tno
+	from teacher
+	where tname = '李亮'
+);
+select classtime,classroom,weektime
+from teacher_course,teacher
+where teacher_course.tno = teacher.tno and teacher.tname = '李亮';
 --31)查询选修了数据库系统概论或数据结构的学生的学号和姓名
-
-
+select sno,sname
+from student
+where sno in (
+	select sno
+	from student_course
+	where cno in (
+		select cno
+		from course
+		where cname = '数据库系统概论' or cname = '数据结构'
+	)
+);
+select distinct student.sno,sname
+from student,course,student_course
+where student.sno = student_course.sno and
+	course.cno = student_course.cno and
+	course.cname in ('数据库系统概论','数据结构');
 --32-67 要求至少使用两种方式查询（对复杂查询，可以建立视图）
 --32)查询至多有两名男生的班级
+select classno
+from student
+except
+	select classno
+	from student
+	where sex = '男'
+	group by classno,sex
+	having COUNT(sno) >=3;
+	
+select classno
+from student
+where sex = '男'
+group by classno
+having COUNT(sno) <3
+union
+	select distinct classno
+	from student
+	where classno not in (
+		select distinct classno
+		from student 
+		where sex = '男'
+	);
 --33）查询至少有一名教授的学院的信息
+select *
+from department
+where dno in (
+	select dno
+	from teacher
+	where pno = '教授'
+	group by dno
+	having COUNT(tno)>=1
+);
+
+select *
+from department
+where dno not in(
+	select distinct dno
+	from department
+	except
+	select distinct dno
+	from teacher
+	where pno = '教授'
+);
 --34).查询出每个老师及其教课情况
+select *
+from teacher,teacher_course
+where teacher.tno = teacher_course.tno;
 --35).查询每门课程及其被选修的人数
+select course.cno,cname,COUNT(*) 选修人数
+from course,student_course
+where course.cno = student_course.cno
+group by course.cno,cname;
 --36).查询籍贯是河北省的教师所教的课程信息
+select *
+from course
+where cno in (
+	select cno
+	from teacher_course
+	where tno in (
+		select tno
+		from teacher
+		where home like '河北省%'
+	)
+);
+select distinct course.*
+from course,teacher,teacher_course
+where course.cno = teacher_course.cno and
+	teacher.tno = teacher_course.tno and
+	home like '河北省%';
 --37).查询软件学院学生情况
+select *
+from student
+where dno in (
+	select dno
+	from department
+	where dname = '软件学院'
+);
+select distinct student.*
+from student,department
+where student.dno = department.dno and
+	dname = '软件学院';
 --38).查询班级人数最多的班的学生情况
 --39).查询张姓学生选修的课程号、课程名
 --40).查询男学生选修课程的平均分
