@@ -219,22 +219,287 @@ from student,department
 where student.dno = department.dno and
 	dname = '软件学院';
 --38).查询班级人数最多的班的学生情况
+select *
+from student
+where classno in(
+	select classno
+	from student
+	group by classno
+	having count(*)>= all(
+		select count(*)
+		from student
+		group by classno)
+);
 --39).查询张姓学生选修的课程号、课程名
+select cno,cname
+from course
+where cno in (
+	select cno
+	from student_course
+	where sno in(
+		select sno
+		from student
+		where sname like '张%'
+	)
+);
+select distinct course.cno,cname
+from course,student,student_course
+where course.cno = student_course.cno and
+	student_course.sno = student.sno and
+	sname like '张%';
 --40).查询男学生选修课程的平均分
+select AVG(score)平均分
+from student_course,student
+where student.sno = student_course.sno and
+	sex = '男';
+
+select AVG(score)平均分
+from student_course
+where sno in(
+	select sno
+	from student
+	where sex = '男'
+);
 --41).查询哪些学生选修了授课学时为 54 的课程
+select distinct student.sno,sname
+from student,course,student_course
+where student.sno = student_course.sno and
+	student_course.cno = course.cno and
+	lecture = 54;
 --42).查询比软件学院学生年龄都小的其他系学生的信息。
+select *
+from student
+where birthday >(
+	select MAX(birthday)
+	from student
+	where dno = (
+		select dno
+		from department
+		where dname = '软件学院')
+	)and dno <>(
+		select dno
+		from department
+		where dname = '软件学院');
 --43).查询比数信学院学院学生年龄大的教育学院学生信息。
+select *
+from student
+where birthday <(
+	select MAX(birthday)
+	from student
+	where dno in (
+		select dno
+		from department
+		where dname = '数信学院'
+	)
+)and dno in (
+	select dno
+	from department
+	where dname = '教育学院'
+);
+select student.*
+from student,department
+where student.dno = department.dno and
+	dname = '教育学院' and 
+	birthday < (
+		select MAX(birthday)
+		from student,department 
+		where student.dno = department.dno and
+			dname = '数信学院'
+	);
 --44).查询班级号为 1 的班的学生 c 语言程序设计成绩的平均成绩
---45).查询计算机导论平均成绩最高的班级。
+select AVG(score)
+from student_course,student,course
+where student.classno = '1' and
+	student.sno = student_course.sno and
+	student_course.cno = course.cno and
+	course.cname = 'c语言程序设计';
+	
+select AVG(score)
+from student_course
+where sno in (
+	select sno
+	from student
+	where classno = '1') and 
+	cno in (
+		select cno
+		from course
+		where cname = 'c语言程序设计'
+	);
+--45).查询计算机导论平均成绩最高的班级
+select classno,AVG(score)
+from student s,student_course sc,course c
+where s.sno = sc.sno and
+	c.cno = sc.cno and 
+	cname = '计算机导论'
+group by classno
+having AVG(score)>= all(
+	select AVG(score)
+	from student s,student_course sc,course c
+	where s.sno = sc.sno and
+		c.cno = sc.cno and 
+		cname = '计算机导论'
+		group by classno
+		having AVG(score) is not null
+);
 --46).查询选修人数最多的课程是哪个老师教的，显示教师号，教师姓名
+select tno,tname
+from teacher
+where tno in(
+	select tno
+	from teacher_course
+	where cno in(
+		select cno
+		from student_course
+		group by cno
+		having COUNT(sno) >=all(
+			select COUNT(*)
+			from student_course
+			group by cno
+		)
+	)
+);
 --47).查询余孝天老师所教各门课程的平均成绩
+select cno,AVG(score)
+from student_course
+where sno in(
+	select a.sno
+	from student a,teacher b,teacher_course c
+	where a.classno = c.classno and
+		b.tno = c.tno and
+		tname = '余孝天') and
+	cno in (
+		select cno
+		from teacher b,teacher_course c
+		where b.tno = c.tno and
+		tname = '余孝天'
+	)group by cno;
+
+select student_course.cno,AVG(score)
+from student_course,teacher_course,teacher 
+where tname = '余孝天' and 
+	student_course.cno = teacher_course.cno and
+	teacher_course.tno = teacher.tno and
+	student_course.sno in (
+		select sno
+		from student
+		where classno in(
+			select distinct classno
+			from teacher_course,teacher
+			where teacher_course.tno = teacher.tno and
+				tname = '余孝天'
+		)
+	)group by student_course.cno;
 --48).查询鲁婵娟老师所教课程的各个班级平均成绩
+select classno,AVG(score)
+from student_course,student
+where student_course.sno = student.sno and
+	student_course.cno in(
+		select cno
+		from teacher_course
+		where tno in(
+			select tno
+			from teacher
+			where tname = '鲁婵娟'
+		)
+	)and
+	student.classno in(
+		select distinct classno
+		from teacher_course,teacher
+		where teacher_course.tno = teacher.tno and
+			tname = '鲁婵娟'
+	)group by classno;
 --49).查询鲁婵娟老师所教课程的学生的成绩
---50).查询有多少人选修了《数据结构》课程的先修课。
+select *
+from student_course
+where cno in(
+	select distinct cno
+	from teacher_course a,teacher b
+	where a.tno = b.tno and tname = '鲁婵娟'
+)and sno in(
+	select sno 
+	from student
+	where classno in(
+		select distinct classno
+		from teacher_course a,teacher b
+		where a.tno = b.tno and tname = '鲁婵娟'
+	)
+);
+--50).查询有多少人选修了《数据结构》课程的先修课
+select COUNT(*)
+from student_course sc
+where cno in(
+	select cpno
+	from course
+	where cname = '数据结构'
+);
 --51).查询软件学院教师所教课程信息
---52).查询软件学院教师所教课程的成绩，将结果按课程号降序排列。
+select *
+from course
+where cno in(
+	select cno
+	from teacher_course
+	where tno in (
+		select tno
+		from teacher
+		where dno in(
+			select dno
+			from department
+			where dname = '软件学院'
+		)
+	)
+);
+select distinct a.*
+from course a,teacher_course b
+where a.cno = b.cno and
+	tno in(
+		select tno
+		from teacher,department
+		where teacher.dno = department.dno and
+			dname = '软件学院'
+	);
+--52).查询软件学院教师所教课程的成绩，将结果按课程号降序排列
+select distinct cno,score
+from  student_course sc
+where cno in(
+	select distinct cno
+	from teacher_course
+	where tno in(
+		select tno
+		from teacher
+		where dno = (
+			select dno
+			from department
+			where dname = '软件学院'
+		)
+	)
+)and
+sno in(
+	select distinct sc.sno
+	from student a,teacher_course b,teacher c,department d
+	where a.classno = b.classno and
+		b.tno = c.tno and
+		c.dno = d.dno and 
+		dname = '软件学院'
+)
+order by cno desc;
 --53).查询未授课教师的姓名和系
---54).按职称显示软件学院的教师人数。
+select tname,dname
+from teacher,department
+where teacher.dno = department.dno and
+	tno not in(
+		select distinct tno
+		from teacher_course
+	);
+	
+--54).按职称显示软件学院的教师人数
+select pno,COUNT(tno)
+from teacher
+where dno in (
+	select dno
+	from department
+	where dname = '软件学院'
+)
+group by pno;
 --55).查询成绩高于《数据结构》平均成绩的学生信息。
 --56).查询学生选修课程的情况，显示学号、姓名、教师姓名、课程名称、成绩。
 --57).查询法政学院教师第一学期所带班级 
@@ -247,4 +512,8 @@ where student.dno = department.dno and
 --64).查询选修了 3 门以上课程学生信息
 --65).查询至少有 2 名女生的班级的学生信息
 --66).查询软件学院年龄小于 25 岁的老师的信息
---67).查询低于该门课程平均分的学生的成绩信息。
+--67).查询低于该门课程平均分的学生的成绩信息
+--集合查询
+--68).年龄小于 23 岁的女老师和女学生的信息
+--69).查询不教课的老师信息。
+--70).查询班级号为 3,且性别为女的学生的信息
