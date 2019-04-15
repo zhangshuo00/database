@@ -501,19 +501,71 @@ where dno in (
 )
 group by pno;
 --55).查询成绩高于《数据结构》平均成绩的学生信息。
---56).查询学生选修课程的情况，显示学号、姓名、教师姓名、课程名称、成绩。
+--56).查询学生选修课程的情况，显示学号、姓名、教师姓名、课程名称、成绩
 --57).查询法政学院教师第一学期所带班级 
 --58).查询第 2 学期哪些教师在公教楼上课。
 --59).查询数信学院的学生各科平均成绩，显示课程名、平均成绩。
 --60).查询选修了全部课程的学生的信息。
 --61).查询至少选修了鲁婵娟所教的课程的学生信息
 --62).查询和张小兵同一个班级的其他学生的信息
+select *
+from student
+where classno in(
+	select classno
+	from student
+	where sname = '张小兵'
+) and sname <> '张小兵';
 --63).查询和刘英伟同年出生的学生信息（参考 sql 日期操作函数）
+select *
+from student
+where YEAR(birthday) in(
+	select year(birthday)
+	from student
+	where sname = '刘英伟'
+);
 --64).查询选修了 3 门以上课程学生信息
+select *
+from student
+where sno in(
+	select sno
+	from student_course
+	group by sno
+	having COUNT(cno)>=3
+);
 --65).查询至少有 2 名女生的班级的学生信息
+select *
+from student
+where classno in(
+	select classno
+	from student
+	where sex = '女'
+	group by classno
+	having COUNT(sno)>=2
+);
 --66).查询软件学院年龄小于 25 岁的老师的信息
+select *
+from teacher
+where dno in(
+	select dno
+	from department
+	where dname = '软件学院'
+)and (YEAR(getdate())-YEAR(birthday))<25;
 --67).查询低于该门课程平均分的学生的成绩信息
+select *
+from student_course b
+where b.score <(
+	select AVG(score)
+	from student_course c
+	where b.cno = c.cno
+);
 --集合查询
 --68).年龄小于 23 岁的女老师和女学生的信息
+select sno 编号 ,sname 姓名
+from student
+where YEAR(GETDATE())-YEAR(birthday)<23 and sex = '女'
+union
+select tno,tname
+from teacher
+where sex = '女' and YEAR(GETDATE())-YEAR(birthday)<23;
 --69).查询不教课的老师信息。
 --70).查询班级号为 3,且性别为女的学生的信息
