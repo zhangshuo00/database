@@ -1,0 +1,99 @@
+
+--2）求供应工程J1零件的供应商号码SNO； 
+select distinct sno
+from SPJ
+where JNO = 'J1';
+--3）求供应工程J1零件P1的供应商号码SNO；
+select sno
+from SPJ
+where JNO = 'J1' and PNO = 'P1';
+--4）求没有使用天津供应商生产的红色零件的工程号JNO；
+select jno
+from J
+where not exists(
+	select *
+	from SPJ
+	where J.JNO = SPJ.JNO and
+		SNO in(
+			select SNO
+			from s
+			where CITY = '天津')and
+		PNO in(
+			select PNO
+			from P
+			where P.PNO = SPJ.PNO and COLOR = '红')
+);
+--5）求至少使用了供应商S1所供应的全部零件的工程号JNO；
+select distinct jno
+from SPJ spj1
+where not exists(
+	select *
+	from SPJ spj2
+	where SNO = 'S1' and
+		not exists(select *
+			from SPJ spj3
+			where spj3.pno = spj2.pno and
+				spj3.jno = spj1.jno
+		)
+);
+--6）找出所有供应商的姓名和所在城市；
+select sname,city
+from s;
+--7）找出所有零件的名称、颜色和重量；
+select pname,color,weight
+from P;
+--8）找出使用供应商S1所供应零件的工程号；
+select jno
+from SPJ
+where SNO = 'S1';
+--9）找出工程项目J2使用的各种零件的名称及其数量；
+select pname,COUNT(*)
+from P
+where PNO in (
+	select PNO
+	from SPJ
+	where JNO = 'J2'
+)
+group by pname;
+--10）找出上海厂商供应的所有零件号码；
+select distinct pno
+from SPJ
+where SNO in(
+	select SNO
+	from s
+	where CITY = '上海'
+);
+--11）找出使用上海产的零件的工程名称；
+select distinct jno
+from SPJ
+where SNO in (
+	select SNO
+	from s
+	where CITY = '上海'
+);
+--12）找出没有使用天津产的零件的工程号码；
+select distinct jno
+from SPJ
+where not SNO in (
+	select SNO
+	from s
+	where CITY = '天津'
+	
+);
+--13) 把全部红色零件的颜色改为蓝色；
+update P
+set COLOR = '蓝'
+where COLOR = '红';
+--14）由S5供应J4的零件P6改为有S3供应；
+update SPJ
+set SNO = 'S3'
+where SNO = 'S5' and JNO = 'J4' and PNO = 'P6';
+--15）从供应商关系中删除S2的记录，并从供应关系中删除相应的记录；
+delete
+from s
+where SNO = 'S2'
+delete
+from SPJ
+where SNO = 'S2';
+--16）将（S2，J6，P4，200）插入到供应关系中
+insert into SPJ values('S2','J6','P4',200);
