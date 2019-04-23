@@ -1,0 +1,17 @@
+create database department;
+use department;
+create table depart(
+	dno char(4) primary key,
+	dname varchar(20) not null unique,
+	prin varchar(20) not null,
+	tel varchar(10) default '0000000'
+);
+create table employee(
+	eno char(6) primary key,
+	ename varchar(20) not null,
+	eage smallint check(eage <= 60 and eage > 0),
+	eadre varchar(10) not null,
+	ecode char(6) not null,
+	dno char(4) not null,
+	foreign key(dno) references depart(dno)
+);
