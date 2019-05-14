@@ -1,0 +1,69 @@
+declare @var1 int,@var2 int;--声明变量
+--set @var1 = 0;--给单个变量赋值
+select @var1 = 1,@var2 = 2;--给多个变量赋值
+
+--定义局部变量
+declare @mayvar char(20)
+set @mayvar = 'hello world'
+--print @mayvar;--只以消息输出
+select @mayvar;--既可以做赋值，也可以做输出
+
+declare @myvar1 datetime,@myvar2 char(20)
+set @myvar1 = GETDATE()--05 10 2019  2:32PM
+set @myvar2 = CONVERT(char(20),@myvar1,102)--2019.05.10 
+print @myvar1
+print @myvar2;
+
+--全局变量@@开头
+print'此电脑SQLServer的版本信息为：'+@@version;
+print'此电脑SQLServer服务器的名字为：'+@@servername;
+print'此电脑SQLServer服务的名字为：'+@@servicename;
+
+if exists(select * from student where sno = '201215121')
+	begin
+		select *
+		from student
+		where sno = '201215121'
+	end
+	else
+		print'未找到'
+		
+select sno,ssex=
+	case ssex
+	when '男'then 'M'
+	when '女'then 'F'
+	end
+from student;
+
+select sno,grade=
+	case
+		when grade is null then '未考'
+		when grade between 0 and 60 then '不及格'
+		when grade between 60 and 70 then '及格'
+		when grade between 70 and 90 then '良好'
+		when grade >= 90 then '优秀'
+	end
+from SC;
+
+declare @sum int,@var3 int
+set @sum = 0
+set @var3 = 0
+while @var3 <= 10
+begin
+	set @sum = @sum + @var3
+	set @var3 = @var3 + 1
+end
+print @sum;
+
+select *
+from student
+
+begin
+	waitfor delay '00:00:10'--延迟10秒执行
+	select * from student
+end
+
+begin
+	waitfor time'15:26:00'
+	select * from student
+end
