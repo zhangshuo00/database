@@ -1,0 +1,72 @@
+declare @myvar1 datetime,@myvar2 char(10)
+set @myvar1 = GETDATE()
+set @myvar2 = CONVERT(char(10),@myvar1,100)
+print @myvar1
+print @myvar2
+
+select sno+sname+CAST(sage as CHAR(5))
+from student;
+select sno+sname+convert(CHAR(5),sage)
+from student;
+
+--游标的五个步骤：声明 打开 读取游标中的数据 关闭游标 释放游标
+declare my_cursor cursor
+for
+	select sno
+	from student
+for read only;
+
+open my_cursor
+
+declare @sno char(20),@count int
+set @count = 0
+fetch next from my_cursor
+into @sno
+while @@FETCH_STATUS = 0
+begin
+	if not exists(select * from SC where sno = @sno)
+		set @count=@count + 1
+	fetch next from my_cursor into @sno
+end
+print @count
+
+close my_cursor
+deallocate my_cursor
+
+select grade
+from SC;
+
+
+--根据成绩统计各个等级的人数
+declare my_cursor1 cursor
+for
+	select grade
+	from sc
+for read only
+
+open my_cursor1
+
+declare @grade1 int,@youxiu int,@lianghao int,@zhongdeng int,@jige int,@bujige int--五个计数器
+select @youxiu = 0,@lianghao = 0,@zhongdeng=0,@jige=0,@bujige=0
+fetch next from my_cursor1 into @grade1
+while @@FETCH_STATUS = 0
+begin
+	if @grade1 >= 90
+		set @youxiu = @youxiu+1
+	else if @grade1>=80
+		set @lianghao = @lianghao+1
+	else if @grade1>=70
+		set @zhongdeng = @zhongdeng+1
+	else if @grade1>=60
+		set @jige = @jige+1
+	else
+		set @bujige = @bujige+1
+	fetch next from my_cursor1 into @grade1
+end
+select @youxiu 优秀,@lianghao,@zhongdeng,@jige,@bujige
+--print '优秀人数'+convert(char(5),@youxiu)
+
+close my_cursor1
+deallocate my_cursor1
+
+--
