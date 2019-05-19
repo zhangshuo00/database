@@ -1,0 +1,25 @@
+--±êÁ¿º¯Êı
+create function myfunc1(@riqi datetime)
+returns varchar(12)
+as
+begin
+	return convert(varchar(12),@riqi,102)
+end
+
+select dbo.myfunc1(GETDATE())
+print dbo.myfunc1(getdate())
+
+create function w(@birthday datetime)
+returns varchar(10)
+as
+begin
+	if year(@birthday) between 1980 and 1989
+		return '80s'
+	if year(@birthday) between 1990 and 1999
+		return '90s'
+	else
+		return 'too old'
+	return ''
+end
+
+select dbo.w('1999-01-01')

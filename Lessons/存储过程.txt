@@ -1,0 +1,79 @@
+--存储过程
+select *
+from student
+where sno in(
+	select sno
+	from SC
+	where grade<60
+	group by sno
+	having COUNT(cno)>= 3
+)
+
+create proc myproc1
+as
+begin
+	select *
+	from student
+	where sno in(
+		select sno
+		from SC
+		where grade<60
+		group by sno
+		having COUNT(cno)>= 3
+	)
+end
+
+exec myproc1
+
+create procedure myproc4
+@xuehao char(9),
+@xingming varchar(20),
+@xingbie char(4)='男',
+@nianling smallint,
+@xibie varchar(10)
+as
+begin
+	insert into student
+	values(@xuehao,@xingming,@xingbie,@nianling,@xibie)
+end
+
+exec myproc4 '123342','张三','',10,'sdjfkl';
+
+create proc myproc5
+@sno char(9),
+@pingjun int out
+as
+begin
+	select @pingjun = AVG(grade)
+	from SC
+	where sno = @sno
+end
+
+declare @shican int
+set @shican = 0
+exec myproc5 '201215121',@shican out
+print @shican
+
+
+create proc myproc6
+@xuehao char(9)
+as
+begin
+	select AVG(grade)
+	from SC
+	where sno = @xuehao
+end
+exec myproc6 '201215121'
+
+create proc proc_sum
+@xueyuan char(20),
+@renshu int out
+as
+begin
+	select @renshu = COUNT(*)
+	from biao
+	where department = @xueyuan
+end
+
+--删除存储过程
+drop proc myproc1
