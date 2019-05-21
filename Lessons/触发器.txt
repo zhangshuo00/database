@@ -1,0 +1,48 @@
+--触发器
+create trigger mytrig on sc
+for insert
+as
+begin
+	declare @xuehao char(9)
+	select @xuehao = sno from inserted
+	if not exists(select *
+		from student
+		where sno = @xuehao)
+		delete from sc where sno = @xuehao
+end
+insert into sc
+values('123456789','1',100)
+
+create trigger mytrig2 on sc
+after insert,update
+as
+begin
+	declare @chengji int
+	select @chengji=inserted.grade from inserted
+	if(@chengji<0 or @chengji>100)
+		raiserror('成绩应在0-100之间',16,1)
+		rollback transaction
+end
+
+update sc
+set grade=101
+where sno='201215121'
+
+create trigger mytrig3 on student
+for update
+as
+begin
+	if update(sno)
+		raiserror('不能修改student表的学号',16,1)
+		rollback transaction
+end
+update student
+set sno='111111111'
+where  sno='201215121'
+
+create trigger mytrig5 on course
+instead of delete
+as
+begin
+	print"qnmd"
+end
